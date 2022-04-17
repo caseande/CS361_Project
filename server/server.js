@@ -1,9 +1,10 @@
-require("dotenv").config()
-const express = require("express")
-const cors = require("cors")
-const bodyParser = require("body-parser")
-const lyricsFinder = require("lyrics-finder")
-const SpotifyWebApi = require("spotify-web-api-node")
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const lyricsFinder = require("lyrics-finder");
+const SpotifyWebApi = require("spotify-web-api-node");
+const PORT = 3001;
 
 const app = express()
 app.use(cors())
@@ -61,4 +62,6 @@ app.get("/lyrics", async (req, res) => {
   res.json({ lyrics })
 })
 
-app.listen(3001)
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}...`);
+});
