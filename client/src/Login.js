@@ -8,11 +8,15 @@ export default function Login() {
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: "100vh" }}
-    >
+      style={{ minHeight: "100vh" }}>
+        <div>
       <a className="btn btn-success btn-lg" href={AUTH_URL}>
         Login With Spotify
       </a>
+        <p>
+          Click Login With Spotify to connect your Spotify account to the application
+        </p>
+      </div>
     </Container>
   )
 }
