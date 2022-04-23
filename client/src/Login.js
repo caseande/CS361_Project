@@ -14,7 +14,7 @@ export default function Login() {
         Login With Spotify
       </a>
         <p>
-          Click Login With Spotify to connect your Spotify account to the application
+          Login With Spotify to connect your Spotify account to the application
         </p>
       </div>
     </Container>
