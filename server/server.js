@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const lyricsFinder = require("lyrics-finder");
+//const searchAlbums = require("album-finder");
 const SpotifyWebApi = require("spotify-web-api-node");
 const PORT = 3001;
 
@@ -10,10 +11,21 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+//let auth_code = 0;
+let spotifyApi;
+/*
+const spotifyApi = new SpotifyWebApi({
+  redirectUri: process.env.REDIRECT_URI,
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  refreshToken,
+})
+*/
+
 
 app.post("/refresh", (req, res) => {
   const refreshToken = req.body.refresh_token
-  const spotifyApi = new SpotifyWebApi({
+  spotifyApi = new SpotifyWebApi({
     redirectUri: process.env.REDIRECT_URI,
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
@@ -23,6 +35,7 @@ app.post("/refresh", (req, res) => {
   spotifyApi
     .refreshAccessToken()
     .then(data => {
+      spotifyApi.setAccessToken(data.body["access_token"]);
       res.json({
         accessToken: data.body.access_token,
         expiresIn: data.body.expires_in,
@@ -36,15 +49,19 @@ app.post("/refresh", (req, res) => {
 
 app.post("/login", (req, res) => {
   const code = req.body.code
-  const spotifyApi = new SpotifyWebApi({
+  auth_code =req.body.code
+  console.log(auth_code);
+  spotifyApi = new SpotifyWebApi({
     redirectUri: process.env.REDIRECT_URI,
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
+
   })
 
   spotifyApi
     .authorizationCodeGrant(code)
     .then(data => {
+      spotifyApi.setAccessToken(data.body["access_token"]);
       res.json({
         accessToken: data.body.access_token,
         refreshToken: data.body.refresh_token,
@@ -56,12 +73,53 @@ app.post("/login", (req, res) => {
     })
 })
 
-app.get("/lyrics", async (req, res) => {
+/*
+// setting the spotify-api goes here:
+const spotifyApi = new SpotifyWebApi({
+  redirectUri: process.env.REDIRECT_URI,
+  clientId: process.env.CLIENT_ID, 
+  clientSecret: process.env.CLIENT_SECRET
+});
+
+// Retrieve an access token
+spotifyApi
+  .clientCredentialsGrant()
+  .then(data => {
+    //console.log(data.body)
+    spotifyApi.setAccessToken(data.body["access_token"]);
+  })
+  .catch(error => {
+    console.log("Something went wrong when retrieving an access token", error);
+  });
+*/
+app.get("/album/:id", async (req, res) => {
+  //console.log(auth_code)
+  const code = req.params.id
+  //const art = req.query.id
+  //auth_code
+
+  //const data = await spotifyApi.authorizationCodeGrant(auth_code)
+  //console.log(data);
+  //const album = (await spotifyApi.getArtistAlbums(''))
+  const artist = (await spotifyApi.getAlbum(code))
+  console.log({artist});
+  res.json({artist});
+  
+  });
+
+  /*
+// localhost/lyrics
+app.get("/albums/:album", async (req, res) => {
+  const albumart = (await searchAlbums(req.params.album)) || "No album Found"
+  res.json({ albumart })
+})
+*/
+app.get("/lyrics/:artist/:track", async (req, res) => {
   const lyrics =
-    (await lyricsFinder(req.query.artist, req.query.track)) || "No Lyrics Found"
+    (await lyricsFinder(req.params.artist, req.params.track)) || "No Lyrics Found"
   res.json({ lyrics })
 })
 
-app.listen(PORT, () => {
+app.listen(process.env.PORT || PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
