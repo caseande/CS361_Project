@@ -1,6 +1,6 @@
-CS361_Project
-
-Main Project for CS361 Application using Spotify Web API
+# CS361_Project
+Main Project for CS361
+Application using Spotify Web API
 
 To create the application, clone the respository locally.
 
